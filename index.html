@@ -7,6 +7,7 @@
 .outline { fill:#ccc; } 
 .single-grant {fill:#000;}
 .single-grant:hover {fill:red;stroke:#fff;}
+.demo {fill:blue;}
 
 
 </style>
@@ -62,13 +63,25 @@ d3.json("data/pa-data.json", function(error, pa) {
   	.data(grants.features)
   	.enter().append('path')
   	.attr('d',path)
-  	.attr('class','single-grant');
+    .attr('class',function(d){ 
+        switch(d.properties.demo_site) { 
+          case 'State College':
+            return "single-grant sc"; 
+          case 'Great Valley':
+            return "single-grant gv";
+          default:
+            return "single-grant demo"
+          }
+     });
 
   sites.on('mouseover',captDisplay)
   	.on('mouseout',function(){ caption.html(''); });
  	
 });
 
+function demoSites(d) {
+
+}
 
 function captDisplay(d) {
 	caption.html(d.properties.school_name + " (" + d.properties.city + ")<br>" + d.properties.proj_name);
