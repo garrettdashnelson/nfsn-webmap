@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style type="text/css">
+
+html, body { margin: 0; padding: 0; }
+
+#map { width: 800px; margin: auto;  }
+#caption { width: 800px; margin: auto; text-align: center; font-family: museo-sans, 'Helvetica Neue','Helvetica','Arial',sans-serif; color: rgb(40, 64, 57); font-size: 0.8em;}
+
+.outline { fill:#ccc; } 
+.single-grant {fill:#000;}
+.single-grant:hover {fill:red;stroke:#fff;}
+.demo {fill:rgb(137, 34, 71);stroke:rgb(137, 34, 71);stroke-width:5px;}
+
+</style>
+
+<body>
+
+<div id="map">
+</div>
+
+<div id="caption"></div>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script>
+
+
+var width = 800,
+    height = 410;
+
+var svg = d3.select("#map").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+var projection = d3.geo.mercator()
+  	.scale(4800)
+  	.center([-92.8, 30.8])
+  	.translate([width/2, (height/2)+30]);
+  
+var path = d3.geo.path()
+  	.projection(projection)
+  	.pointRadius(4);
+
+var caption = d3.select('#caption')
+  
+
+d3.json("data/la-data.json", function(error, la) {
+  if (error) return console.error(error);
+
+  // console.log(la);
+  
+  var outline = topojson.feature(la, la.objects.la);
+
+  svg.append("path")
+  	.datum(outline)
+  	.attr("d", path)
+  	.attr("class", "outline");
+
+  var grants = topojson.feature(la, la.objects.lagrants);
+
+  var sites = svg.append('g')
+  	.attr('class','grants')
+  	.selectAll('path')
+  	.data(grants.features)
+  	.enter().append('path')
+  	.attr('d',path)
+    .attr('class',demoSites);
+
+  sites.on('mouseover',captDisplay)
+  	.on('mouseout',function(){ caption.html(''); });
+ 	
+});
+
+function demoSites(d) {
+
+     switch(d.properties.demo_site) { 
+          case 'Richland':
+            return "single-grant rc"; 
+          case 'Lafayette':
+            return "single-grant lf";
+          default:
+            return "single-grant demo"
+          }
+
+}
+
+function captDisplay(d) {
+	caption.html(d.properties.school_name + " (" + d.properties.city + ")<br>" + d.properties.proj_name);
+}
+
+	
+</script>
