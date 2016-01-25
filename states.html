@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+<link rel="stylesheet" type="text/css" href="style.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+
+</head>
+<body>
+
+<div id="select-state">
+<div id="select-ky" class="select-state-option chosen">Kentucky</div>
+<div id="select-la" class="select-state-option">Louisiana</div>
+<div id="select-pa" class="select-state-option">Pennsylvania</div>
+
+
+</div>
+
+<div id="map">
+</div>
+
+<div id="caption"></div>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+
+<script>
+
+
+var width = 800,
+    height = 410;
+
+var svg = d3.select("#map").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+var projection = d3.geo.mercator();
+  
+var path = d3.geo.path()
+  	.projection(projection)
+  	.pointRadius(4);
+
+var caption = d3.select('#caption')
+
+var geoVariables = {
+  "ky": {
+    "centerpoint": [-85.2,37.5],
+    "scale": 4800
+  },
+    "la": {
+    "centerpoint": [-92.8, 30.8],
+    "scale": 4800
+  },
+    "pa": {
+      "centerpoint": [-77.82620, 40.88975],
+      "scale": 6000
+    }
+ 
+};
+  
+
+function generateMap(state) {
+
+
+
+svg.text('');
+
+var data_src = "data/all-states.json";
+
+    projection.scale(geoVariables[state].scale)
+    .center(geoVariables[state].centerpoint)
+    .translate([width/2, (height/2)+30]);
+
+d3.json(data_src, function(error, geodata) {
+  if (error) return console.error(error);
+
+  
+  var outline = topojson.feature(geodata, geodata.objects[state]);
+
+  svg.append("path")
+  	.datum(outline)
+  	.attr("d", path)
+  	.attr("class", "outline");
+
+  var grantname = state + "grants";
+
+  var grants = topojson.feature(geodata, geodata.objects[grantname]);
+
+  var sites = svg.append('g')
+  	.attr('class','grants')
+  	.selectAll('path')
+  	.data(grants.features)
+  	.enter().append('path')
+  	.attr('d',path)
+    .attr('class',demoSites);
+
+  sites.on('mouseover',captDisplay)
+  	.on('mouseout',function(){ caption.html(''); });
+ 	
+});
+
+}
+
+function demoSites(d) {
+
+     switch(d.properties.demo_site) { 
+          case 'Demo Site':
+            return "single-grant demo";
+          default:
+            return "single-grant"
+          }
+}
+
+function captDisplay(d) {
+	caption.html(d.properties.school_name + " (" + d.properties.city + ")<br>" + d.properties.proj_name);
+}
+
+
+$('.select-state-option').click(
+    function() {
+
+      $('.select-state-option').removeClass('chosen');
+      $(this).addClass('chosen');
+
+      var state_abbrev = this.id.slice(-2);
+      generateMap(state_abbrev);
+
+      // console.log(this.id);
+    });
+
+$(document).ready( generateMap("ky") );
+
+	
+</script>

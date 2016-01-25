@@ -1,0 +1,27 @@
+html, body { margin: 0; padding: 0; font-family: museo-sans, 'Helvetica Neue','Helvetica','Arial',sans-serif;  }
+
+#map { width: 800px; margin: auto;  }
+#caption { width: 800px; margin: auto; text-align: center; color: rgb(40, 64, 57); font-size: 0.8em;}
+
+.outline { fill:#ccc; } 
+.single-grant {fill:#000;}
+.single-grant:hover {fill:red;stroke:#fff;}
+.demo {fill:#c4122f;stroke:#c4122f;stroke-width:5px;}
+
+#select-state {
+	border: 2px solid #8d0f06;
+	float: left;
+	border-radius: 3px;
+	color: #8d0f06;
+	margin: 20px 0 0 20px;
+}
+
+.select-state-option { float: left;
+	padding: 4px;
+	border-right: 2px solid #8d0f06; 
+	cursor: pointer; }
+
+.select-state-option:last-child { border-right: 0; }
+
+.chosen { background-color: #8d0f06; color: #fff; }
+
